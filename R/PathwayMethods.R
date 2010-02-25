@@ -113,7 +113,7 @@ desummarize.ranks <- function(ranks, mapping){
 #' @param fname path to the HPRD flat file.
 #' @param chipProteins limit the resulting adjacency matrix to certain proteins.
 #' 
-#' @return A sparse adjacency matrix
+#' @return An adjacency matrix
 #' @export
 #' @callGraphPrimitives
 #' @author Marc Johannes \email{M.Johannes@@DKFZ.de}
@@ -144,7 +144,7 @@ read.hprd <- function(fname, chipProteins = NULL){
   hprd=hprd[!is.na(rowSums(hprd)),]
 
 
-  hprdM=Matrix(0,length(proteins),length(proteins))
+  hprdM=matrix(0,length(proteins),length(proteins))
   rownames(hprdM) = proteins
   colnames(hprdM) = proteins
   

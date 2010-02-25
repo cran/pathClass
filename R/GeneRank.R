@@ -31,8 +31,6 @@
 
 geneRank <- function(W,ex,d, max.degree=Inf){
 
-  W=Matrix(W)
-  
   ex = abs(ex)
 
   ## normalize expression values
@@ -47,22 +45,22 @@ geneRank <- function(W,ex,d, max.degree=Inf){
   ## from KEGG we get a directed graph
   ## thus, the column sums correspond to
   ## to the in-degree of a particular gene
-  degrees = pmin(max.degree, pmax(1,Matrix:::colSums(W), na.rm=T))
+  degrees = pmin(max.degree, pmax(1, colSums(W), na.rm=T))
 
   ## A = Identity Matrix with dimensions
   ## same as the adjacency matrix
-  A=Matrix(0, nrow = dimW, ncol = dimW)
+  A=matrix(0, nrow = dimW, ncol = dimW)
   diag(A) = 1
   
   ## produce a matrix with the degrees on
   ## the diagonal
-  D1=Matrix(0, nrow = dimW, ncol = dimW)
+  D1=matrix(0, nrow = dimW, ncol = dimW)
   diag(D1) = 1.0/degrees
 
   ## divide the in-degrees of the gene
   ## by the overall in-degree(colSum) of the gene
   ## => kind of normalizing the in-degrees
-  A = A - d*(Matrix:::t(W) %*% D1)
+  A = A - d*(t(W) %*% D1)
 
   ## here, we give 1-d 'for free'
   b  = (1-d) * norm_ex

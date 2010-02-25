@@ -6,7 +6,7 @@
 \description{Parse the HPRD flat file}
 \details{This function parses the tab delimited flat file of protein-protein interactions
 coming from the HPRD (\url{http://www.hprd.org/download}).}
-\value{A sparse adjacency matrix}
+\value{An adjacency matrix}
 \author{Marc Johannes \email{M.Johannes@DKFZ.de}}
 \arguments{\item{fname}{path to the HPRD flat file.}
 \item{chipProteins}{limit the resulting adjacency matrix to certain proteins.}
