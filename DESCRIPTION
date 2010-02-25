@@ -1,7 +1,7 @@
 Package: pathClass
 Type: Package
 Title: Classification using biological pathways as prior knowledge
-Version: 0.9
+Version: 0.9.1
 Date: 2010-02-25
 Author: Marc Johannes
 Maintainer: Marc Johannes <M.Johannes@DKFZ-Heidelberg.de>
@@ -14,12 +14,12 @@ Description: pathClass is a collection of classification methods that
 Depends: R (>= 2.9.0), svmpath, kernlab, affy, Biobase, ROCR, igraph,
         lpSolve
 Enhances: multicore
-Suggests: hgu95av2.db
+Suggests: hu6800.db, golubEsets
 License: GPL (>= 2)
 LazyLoad: yes
 Collate: 'CrossValidation.R' 'GeneRank.R' 'GraphSVM.R'
         'networkBasedSVM.R' 'PathwayMethods.R'
         'RecursiveFeatureElimination.R' 'RRFE.R' 'SpanBound.R' 'SVMs.R'
-Packaged: 2011-01-04 14:44:01 UTC; marc
+Packaged: 2011-01-18 10:33:11 UTC; marc
 Repository: CRAN
-Date/Publication: 2011-01-04 16:39:17
+Date/Publication: 2011-01-18 14:47:22

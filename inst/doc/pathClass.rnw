@@ -46,7 +46,7 @@
 \begin{document}
 %\doublespacing
 
-\title{pathClass: Classification with prior knowledge on feature connectivity\\{\small(Version 0.7.0)}\\[5mm]
+\title{pathClass: SVM-based classification with prior knowledge on feature connectivity\\{\small(Version 0.8.0)}\\[5mm]
 User`s Guide \\}
 
 \author{Marc Johannes\\
@@ -66,15 +66,9 @@ mostly with biological data. Thus, in this vignette we demonstrate the
 usage of the package and its functions using biologically data.
 
 The package can be loaded by typing:
-<<loadPackage, results=hide, include=FALSE, eval=TRUE>>=
+<<loadPackage, results=hide, eval=TRUE>>=
 library(pathClass)
 @
-
-To keep the results of the vignette reproducible we initialize the
-random number generator:
-<<setSeed, eval=TRUE>>=
-set.seed(12345)
-@ 
 
 \section{What data do we need}
 For a \emph{standard} classification task one needs a data matrix to train on
@@ -87,39 +81,28 @@ structure of these data objects and give examples how to create and
 use them.
 
 \subsection{The class labels}
-In this vignette we are going to use the Acute Lymphoblastic Leukemia
-Data from the Ritz Laboratory which is part of the R package
-\texttt{ALL}:
+In this vignette we are going to use the combined test and training sets from the Golub paper 
+which is part of the R package \texttt{golubEsets} available on Bioconductor:
 <<loadALLpackage, eval=True>>=
-library(ALL)
-data(ALL)
+library(golubEsets)
+data(Golub_Merge)
 @ 
 
-As already shown in \cite{Porzelius2010a}, we are going to
-predict wether or not a patient will have a relapse within one year.
-Thus, we create some class labels using the \texttt{phenoData} object:
+We are going to predict whether the patient had AML or ALL. Hence, we create the class
+labels as:
 <<classLabels, eval=TRUE>>=
-diag <- strptime(pData(ALL)$diagnosis, "%m/%d/%Y")
-dls <- strptime(pData(ALL)$"date last seen", "%m/%d/%Y")
-time.na <- dls-diag
-nas <- which(is.na(time.na))
-time <- time.na[-nas]
-relapse.na <- pData(ALL)$relapse
-relapse <- relapse.na[-nas]
-relapse.within.first.year <- time<365
-relapse.within.first.year <- as.factor(as.numeric(relapse.within.first.year))
+y <- pData(Golub_Merge)$ALL
 @ 
 
-From this output we can see that \texttt{relapse.within.first.year}
-that \Sexpr{length(relapse.within.first.year)} remain in the
-analysis.
+From this output we can see that \texttt{y} contains \Sexpr{length(y)}
+entries. That is, \Sexpr{length(y)} patients are used for the analysis.
 
 \subsection{The data matrix}
 Next, we need the corresponding expression data as data matrix
 $\mathbf{D}^{n \times p}$ with $n$ samples of $p$
-measurements. Therefore, we discard the same patients as above: 
+measurements. 
 <<loadDataMatrix, eval=true>>=
-x <- exprs(ALL)[,-nas]
+x <- exprs(Golub_Merge)
 @
 This data set contains \Sexpr{nrow(x)}
 features measured in 
@@ -137,46 +120,50 @@ the connectivity of the features in \texttt{x}. Therefore, we download
 from \href{http://www.hprd.org/download}{\texttt{http://www.hprd.org/download}} the file of binary
 protein-protein interactions in tab delimited format. After extracting
 the archive we use \texttt{pathClass} to read the tab-delimited file:
-<<loadPathClass, eval=TRUE, results=hide>>=
-library(pathClass)
-@ 
 
 <<hprd, eval=FALSE>>=
 hprd <- read.hprd('BINARY_PROTEIN_PROTEIN_INTERACTIONS.txt')
 @ 
-However, for the purpose of the vignette we will use a random graph
-with RefSeq IDs as \texttt{rownames} and \texttt{colnames}. This graph
-can be loaded as follows:
-<<sampleGraph, eval=True>>=
-data(adjacency.matrix)
-@ 
-This gives us an adjacency matrix of dimensions \Sexpr{nrow(adjacency.matrix)}
-$\times$ \Sexpr{ncol(adjacency.matrix)}. Since most classification
-algorithm can ``only'' use those features which that are present in both the
-data matrix \texttt{x} and the \texttt{adjacency.matrix} we have to
+
+Since most classification
+algorithm can ``only'' use those features that are present in both, the
+data matrix \texttt{x} and the \texttt{hprd} adjacency matrix, we have to
 match both objects to each other. Therefore, we need a mapping
-containing the information which protein of \texttt{adjacency.matrix}
+containing the information which protein of \texttt{hprd}
 matches to which probe set in \texttt{x}.
 
 \subsection{The mapping}
 For most microarrays there is a annotation package available. Since we
 are dealing with expression data from chip
-\texttt{\Sexpr{annotation(ALL)}} we load the
+\texttt{\Sexpr{annotation(Golub_Merge)}} we load the
 corresponding annotation package and create a mapping from probe set
 ID to protein ID:
 <<mapping, eval=TRUE>>=
-library('hgu95av2.db')
-mapped.probes <- mappedkeys(hgu95av2REFSEQ)
-refseq <- as.list(hgu95av2REFSEQ[mapped.probes])
+ann <- annotation(Golub_Merge)
+library(paste(ann,'db',sep='.'), character.only=TRUE)
+
+graphIDs <- "REFSEQ"
+rs <- get(paste(ann, graphIDs, sep=''))
+refseq <- mget(featureNames(Golub_Merge), rs)
 times <- sapply(refseq, length)
 mapping <- data.frame(probesetID=rep(names(refseq), times=times),
                       graphID=unlist(refseq),
                       row.names=NULL,
                       stringsAsFactors=FALSE)
+nas <- which(is.na(mapping[,'graphID']))
+mapping <- mapping[-nas,]
 mapping <- unique(mapping)
 head(mapping)
 @ 
 
+The first line in the above code-chunk identifies the annotation of
+the expression set. The second line load the corresponding annotation
+package. Line three defines the kind of IDs that are present in the
+graph structure, must be one of \texttt{ls(paste('package:',ann,'.db',sep=''))}.
+Lines four and five extract the graph IDs, in this case
+\Sexpr{print(graphIDs)}, that match to the \texttt{featureNames} of
+our expression set. The remaing code puts everything into the order
+needed by \texttt{pathClass}. 
 Now we have a mapping with \Sexpr{nrow(mapping)} rows. It is important
 that this mapping has at least two columns named \textbf{\texttt{graphID}} and
 \textbf{\texttt{probesetID}} since those names are needed internally
@@ -184,12 +171,12 @@ when \texttt{pathClass} makes use of the mapping.
 
 In a next step we can make use of the function
 \texttt{matchMatrices()} to match the data matrix \texttt{x} to the
-\texttt{adjacency.matrix}:
-<<matchMatrices, eval=TRUE>>=
-matched <- matchMatrices(x=x, adjacency=adjacency.matrix, mapping=mapping)
+\texttt{hprd}:
+<<matchMatrices, eval=FALSE>>=
+matched <- matchMatrices(x=x, adjacency=hprd, mapping=mapping)
 @ 
 
-The list \texttt{matched} contains copies of \texttt{x}, \texttt{adjacency.matrix}
+The list \texttt{matched} contains copies of \texttt{x}, \texttt{hprd}
 and \texttt{mapping} however with matching dimensions. Thus, these
 objects can now be used for classification.
 
@@ -216,7 +203,15 @@ repeated $y$-fold cross-validation. Additionally the
 architecture of modern PCs or a computing cluster. To use the parallel
 version of the method the user has to load the library
 \texttt{multicore} prior to calling \texttt{crossval()} and to set
-the parameter \texttt{parallel} to \texttt{TRUE}.
+the parameter \texttt{parallel} to \texttt{TRUE}. It is, however,
+worth mentioning that for parallel use all data objects a copied for
+each of the CPU processes. Therefore, one has to ensure that the
+object fit into the memory of the server.
+
+For the purpose of reproducibility we initialize the random number
+generator prior to calling the individual algorithms. This also
+ensures that each algorithm uses the same splits within the
+cross-validation.
 
 \subsection{Reweighted Recursive Feature Elimination}
 
@@ -229,32 +224,33 @@ influence of the graph structure on the ranking of the genes. A value
 of \texttt{d} $\rightarrow$ 1 puts more weight on the connectivity
 infromation whereas \texttt{d} $\rightarrow$ 0 relies more on the
 expression data. To use the RRFE method one can use:
-<<RRFE, results=hide, eval=TRUE>>=
+<<RRFE, results=hide, eval=FALSE>>=
+set.seed(12345)
 res.rrfe <- crossval(x,
-                     relapse.within.first.year,
+                     y,
                      DEBUG=TRUE,
                      theta.fit=fit.rrfe,
-                     folds=3,
-                     repeats=1,
+                     folds=10,
+                     repeats=5,
                      parallel=TRUE,
                      Cs=10^(-3:3),
                      mapping=mapping,
-                     Gsub=adjacency.matrix,
+                     Gsub=hprd,
                      d=1/2)
 @ 
 or, to use all features:
 <<RRFEallFeatures, results=hide, eval=FALSE>>=
 res.rrfe <- crossval(x,
-                     relapse.within.first.year,
+                     y,
                      DEBUG=TRUE,
                      theta.fit=fit.rrfe,
-                     folds=3,
-                     repeats=1,
+                     folds=10,
+                     repeats=5,
                      parallel=TRUE,
                      Cs=10^(-3:3),
                      useAllFeatures=TRUE,
                      mapping=mapping,
-                     Gsub=adjacency.matrix,
+                     Gsub=hprd,
                      d=1/2)
 @ 
 Please, have a look into the help files or the paper
@@ -267,41 +263,46 @@ mapping from above, since the dimensions of the data objects have to
 match exactely. However, instead of an adjacency matrix it needs an
 adjacency list which we have to create before:
 
-<<networkBasedSVM, results=hide, eval=TRUE>>=
+<<networkBasedSVM, results=hide, eval=FALSE>>=
 ad.list <- as.adjacencyList(matched$adjacency)
 
+set.seed(12345)
 res.nBSVM <- crossval(matched$x,
-                      relapse.within.first.year,
+                      y,
                       theta.fit=fit.networkBasedSVM,
-                      folds=3,
-                      repeats=1,
+                      folds=10,
+                      repeats=5,
                       DEBUG=TRUE,
                       parallel=FALSE,
                       adjacencyList=ad.list,
                       lambdas=10^(-1:2),
-                      sd.cutoff=0.5)
+                      sd.cutoff=150)
 @ 
 
 Since, the algorithm internally uses \texttt{lpSolve}, it has to calculate a
 constraints-matrix. Thus, when having lots of features this matrix can
 become very big. Therefore, we added the parameter \texttt{sd.cutoff} which
-only keeps genes with standard deviation $\ge$ \texttt{sd.cutoff}.
+only keeps genes with standard deviation $\ge$
+\texttt{sd.cutoff}. Further, we recommend not to run this algorithm in 
+parallel, since the contraints matrix is created by each process,
+which might result in memory overflow.
 
 \subsection{graph SVM}
 
 \cite{Rapaport2007} developed a supervised classification framework
 which we refer to as ``graph SVM''. This methods makes use of a so-called
 diffusion kernel, which has to be calculated before using this method:
-<<graphSVM, results=hide, eval=TRUE>>=
+<<graphSVM, results=hide, eval=FALSE>>=
 dk <- calc.diffusionKernel(L=matched$adjacency,
                            is.adjacency=TRUE,
                            beta=0)
 
+set.seed(12345)
 res.gSVM <- crossval(matched$x,
-                     relapse.within.first.year,
+                     y,
                      theta.fit=fit.graph.svm,
-                     folds=3,
-                     repeats=1,
+                     folds=10,
+                     repeats=5,
                      DEBUG=TRUE,
                      parallel=FALSE,
                      Cs=10^(-3:3),
@@ -324,55 +325,57 @@ showing the overall performance.
 
 We can, however, also combine all results into one ROC curve by using
 the ROCR package:
-<<results, include=FALSE>>=
-pred.rrfe <- prediction(res.rrfe$cv, labels=relapse.within.first.year)
+
+
+<<benchmark, fig=TRUE, echo=TRUE, include=TRUE, eval=FALSE>>=
+cv.labels <- matrix(rep(y,5), ncol=5)
+pred.rrfe <- prediction(res.rrfe$cv, labels=cv.labels)
+auc.rrfe  <- round(mean(unlist(performance(pred.rrfe, 'auc')@y.values)),3)
 plot(performance(pred.rrfe, measure = "tpr", x.measure = "fpr"),
      col='red',
-     main='Benchmark of the algorithms')
+     main='Benchmark of the algorithms',
+     avg = "threshold")
 
-pred.nBSVM <- prediction(res.nBSVM$cv, labels=relapse.within.first.year)
+pred.nBSVM <- prediction(res.nBSVM$cv, labels=cv.labels)
+auc.nBSVM  <- round(mean(unlist(performance(pred.nBSVM, 'auc')@y.values)),3)
 plot(performance(pred.nBSVM, measure = "tpr", x.measure = "fpr"),
      add=TRUE,
-     col='blue')
+     col='blue',
+     avg = "threshold")
 
-pred.gSVM <- prediction(res.gSVM$cv, labels=relapse.within.first.year)
+pred.gSVM <- prediction(res.gSVM$cv, labels=cv.labels)
+auc.gSVM  <- round(mean(unlist(performance(pred.gSVM, 'auc')@y.values)),3)
 plot(performance(pred.gSVM, measure = "tpr", x.measure = "fpr"),
      add=TRUE,
-     col='green')
+     col='green',
+     avg = "threshold")
 
 legend('bottomright',
-       c('RRFE','network based SVM', 'graph SVM'),
+       c(paste('RRFE (AUC=',auc.rrfe,')',sep=''),
+         paste('network based SVM (AUC=',auc.nBSVM,')',sep=''),
+         paste('graph SVM (AUC=',auc.gSVM,')',sep='')),
        text.col=c('red','blue','green'),
        col=c('red','blue','green'),
        lty=1,
-       bty='n')
+       bty='n',
+       cex=1.3)
 
 abline(b=1,a=0,col='gray')
 @ 
 
-\begin{figure}[h!]
+\begin{figure}[!h]
 \begin{center}
-<<label=fig1,fig=TRUE,echo=FALSE>>=
-plot(performance(pred.rrfe, measure = "tpr", x.measure = "fpr"),
-     col='red',
-     main='Benchmark of the algorithms')
-
-lines(unlist(performance(pred.nBSVM, measure = "tpr", x.measure = "fpr")@x.values),unlist(performance(pred.nBSVM, measure = "tpr", x.measure = "fpr")@y.values), col='blue')
-lines(unlist(performance(pred.gSVM, measure = "tpr", x.measure = "fpr")@x.values),unlist(performance(pred.gSVM, measure = "tpr", x.measure = "fpr")@y.values), col='green')
-
-legend('bottomright',
-       c('RRFE','network based SVM', 'graph SVM'),
-       text.col=c('red','blue','green'),
-       col=c('red','blue','green'),
-       lty=1,
-       bty='n')
-
-abline(b=1,a=0,col='gray')
-@
+\includegraphics{pathClass-benchmark}
 \end{center}
 \caption{ROC curves for all three algorithms}
 \label{fig:resultsROC}
 \end{figure}
+
+
+It is important to note that these results can not be generalized to
+be true for all data sets. We provide this package, that the user can
+easily evaluate all algorithms and based on these result choose the
+best one.
 
 These commands produce figure \ref{fig:resultsROC}. Additionally we
 can extract the features which have been chosen by the classifier by
