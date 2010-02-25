@@ -27,7 +27,8 @@ found by an inner-cross validation.}
 \item{adjacencyList}{a adjacency list representing the network structure. The list can be generated from a
 adjacency matrix by using the function \code{\link{as.adjacencyList}}}
 }
-\examples{library(Biobase)
+\examples{\dontrun{
+library(Biobase)
 data(sample.ExpressionSet)
 x <- t(exprs(sample.ExpressionSet))
 y <- factor(pData(sample.ExpressionSet)$sex)
@@ -42,5 +43,6 @@ library(pathClass)
 data(adjacency.matrix)
 matched <- matchMatrices(x=x, adjacency=adjacency.matrix, mapping=mapping)
 ad.list <- as.adjacencyList(matched$adjacency)
-res.nBSVM <- crossval(matched$x, y, theta.fit=fit.networkBasedSVM, folds=3, repeats=1, DEBUG=TRUE, parallel=FALSE, adjacencyList=ad.list, lambdas=10^(-1:2), sd.cutoff=50)}
+res.nBSVM <- crossval(matched$x, y, theta.fit=fit.networkBasedSVM, folds=3, repeats=1, DEBUG=TRUE, parallel=FALSE, adjacencyList=ad.list, lambdas=10^(-1:2), sd.cutoff=50)
+}}
 

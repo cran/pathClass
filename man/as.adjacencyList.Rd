@@ -11,7 +11,9 @@
 \item{skip.redundant.nodes}{if \code{TRUE} and the graph is undirected only the upper triangular matrix (including the diagonal) is used to create the adjacency list.}
 \item{is.directed}{determines wether or not the graph is directed.}
 }
-\examples{library(pathClass)
+\examples{\dontrun{
+library(pathClass)
 data(adjacency.matrix)
-ad.list <- as.adjacencyList(adjacency.matrix)}
+ad.list <- as.adjacencyList(adjacency.matrix)
+}}
 

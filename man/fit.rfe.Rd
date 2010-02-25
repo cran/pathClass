@@ -20,9 +20,11 @@ Possible values are \emph{center} and/or \emph{scale}. Defaults to \code{c('cent
 \item{Cs}{soft-margin tuning parameter of the SVM. Defaults to \code{10^c(-3:3)}.}
 \item{stepsize}{amount of features that are discarded in each step of the feature elimination. Defaults to 10\%.}
 }
-\examples{library(Biobase)
+\examples{\dontrun{
+library(Biobase)
 data(sample.ExpressionSet)
 x <- t(exprs(sample.ExpressionSet))
 y <- factor(pData(sample.ExpressionSet)$sex)
-res.rfe <- crossval(x,y,DEBUG=TRUE,theta.fit=fit.rfe,folds=2,repeats=1,parallel=TRUE,Cs=10^(-3:3))}
+res.rfe <- crossval(x,y,DEBUG=TRUE,theta.fit=fit.rfe,folds=2,repeats=1,parallel=TRUE,Cs=10^(-3:3))
+}}
 

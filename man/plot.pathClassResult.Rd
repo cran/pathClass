@@ -19,10 +19,12 @@ one PDF file is created for each result.}
 \item{spread.estimate}{method to show the variation around the average of the ROC curve. See \code{'\linkS4class{performance}'} for more information.}
 \item{...}{currently ignored.}
 }
-\examples{library(Biobase)
+\examples{\dontrun{
+library(Biobase)
 data(sample.ExpressionSet)
 x <- t(exprs(sample.ExpressionSet))
 y <- factor(pData(sample.ExpressionSet)$sex)
 res.rfe <- crossval(x,y,DEBUG=TRUE,theta.fit=fit.rfe,folds=2,repeats=1,parallel=TRUE,Cs=10^(-3:3))
-plot(res.rfe, toFile=FALSE)}
+plot(res.rfe, toFile=FALSE)
+}}
 

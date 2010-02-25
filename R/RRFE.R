@@ -21,14 +21,17 @@
 #' @param Gsub an adjacency matrix that represents the underlying biological network.
 #' @param d the damping factor which controls the influence of the network data and the fold change on the ranking of the genes.
 #' Defaults to 0.5 
-#' @return a RRFE fit object. \item{features}{the selected features} \item{error.bound}{the span bound of the model} \item{fit}{the fitted SVM model}
+#' @return a RRFE fit object.
+#' \item{features}{the selected features}
+#' \item{error.bound}{the span bound of the model}
+#' \item{fit}{the fitted SVM model}
 #' @references Johannes M, et al. (2010). Integration Of Pathway Knowledge Into A Reweighted Recursive Feature Elimination Approach For Risk Stratification Of Cancer Patients. \emph{Bioinformatics}
 #' @export
 #' @callGraphPrimitives
 #' @note The optimal number of features is found by using the span estimate. See Chapelle, O., Vapnik, V., Bousquet, O., and Mukherjee, S. (2002). Choosing multiple parameters for support vector machines. \emph{Machine Learning}, 46(1), 131-159.
-#'
 #' @author Marc Johannes \email{M.Johannes@@DKFZ.de}
 #' @examples
+#' \dontrun{
 #' library(Biobase)
 #' data(sample.ExpressionSet)
 #' x <- t(exprs(sample.ExpressionSet))
@@ -43,6 +46,7 @@
 #' library(pathClass)
 #' data(adjacency.matrix)
 #' res.rrfe <- crossval(x, y, DEBUG=TRUE, theta.fit=fit.rrfe, folds=3, repeats=1, parallel=TRUE, Cs=10^(-3:3), mapping=mapping, Gsub=adjacency.matrix, d=1/2)
+#' }
 fit.rrfe = function(x, y, DEBUG=FALSE, scale=c('center', 'scale'), Cs=10^c(-3:3), stepsize=0.1, useAllFeatures=F,  mapping, Gsub, d=0.5){
 
   best.bound = Inf

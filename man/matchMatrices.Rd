@@ -20,7 +20,8 @@ encoded in the \code{mapping} to create a graph of probe sets rather then a grap
 row/colnames of the adjacency matrix.}
 \item{adjacency}{the adjacencymatrix of the underlying graph structure.}
 }
-\examples{library(Biobase)
+\examples{\dontrun{
+library(Biobase)
 data(sample.ExpressionSet)
 x <- t(exprs(sample.ExpressionSet))
 y <- factor(pData(sample.ExpressionSet)$sex)
@@ -33,5 +34,6 @@ mapping <- data.frame(probesetID=rep(names(refseq), times=times), graphID=unlist
 mapping <- unique(mapping)
 library(pathClass)
 data(adjacency.matrix)
-matched <- matchMatrices(x=x, adjacency=adjacency.matrix, mapping=mapping)}
+matched <- matchMatrices(x=x, adjacency=adjacency.matrix, mapping=mapping)
+}}
 

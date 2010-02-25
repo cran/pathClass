@@ -13,7 +13,10 @@ a gene or protein in the network might be represented by more than one probe set
 which genes/protein in the network belongs to which probeset on the chip. However, the method is able to use all feature when one
 sets the parameter \code{useAllFeatures} to \code{TRUE}. When doing so, RRFE assigns the minimal wheight returned by GeneRank
 to those genes which are not present in \code{Gsub}.}
-\value{a RRFE fit object. \item{features}{the selected features} \item{error.bound}{the span bound of the model} \item{fit}{the fitted SVM model}}
+\value{a RRFE fit object.
+\item{features}{the selected features}
+\item{error.bound}{the span bound of the model}
+\item{fit}{the fitted SVM model}}
 \references{Johannes M, et al. (2010). Integration Of Pathway Knowledge Into A Reweighted Recursive Feature Elimination Approach For Risk Stratification Of Cancer Patients. \emph{Bioinformatics}}
 \note{The optimal number of features is found by using the span estimate. See Chapelle, O., Vapnik, V., Bousquet, O., and Mukherjee, S. (2002). Choosing multiple parameters for support vector machines. \emph{Machine Learning}, 46(1), 131-159.}
 \author{Marc Johannes \email{M.Johannes@DKFZ.de}}
@@ -30,7 +33,8 @@ Possible values are \emph{center} and/or \emph{scale}. Defaults to \code{c('cent
 \item{d}{the damping factor which controls the influence of the network data and the fold change on the ranking of the genes.
 Defaults to 0.5}
 }
-\examples{library(Biobase)
+\examples{\dontrun{
+library(Biobase)
 data(sample.ExpressionSet)
 x <- t(exprs(sample.ExpressionSet))
 y <- factor(pData(sample.ExpressionSet)$sex)
@@ -43,5 +47,6 @@ mapping <- data.frame(probesetID=rep(names(refseq), times=times), graphID=unlist
 mapping <- unique(mapping)
 library(pathClass)
 data(adjacency.matrix)
-res.rrfe <- crossval(x, y, DEBUG=TRUE, theta.fit=fit.rrfe, folds=3, repeats=1, parallel=TRUE, Cs=10^(-3:3), mapping=mapping, Gsub=adjacency.matrix, d=1/2)}
+res.rrfe <- crossval(x, y, DEBUG=TRUE, theta.fit=fit.rrfe, folds=3, repeats=1, parallel=TRUE, Cs=10^(-3:3), mapping=mapping, Gsub=adjacency.matrix, d=1/2)
+}}
 

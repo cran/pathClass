@@ -26,6 +26,7 @@
 #'
 #' @author Marc Johannes \email{M.Johannes@@DKFZ.de}
 #' @examples
+#' \dontrun{
 #' library(Biobase)
 #' data(sample.ExpressionSet)
 #' x <- t(exprs(sample.ExpressionSet))
@@ -42,6 +43,7 @@
 #' matched <- matchMatrices(x=x, adjacency=adjacency.matrix, mapping=mapping)
 #' ad.list <- as.adjacencyList(matched$adjacency)
 #' res.nBSVM <- crossval(matched$x, y, theta.fit=fit.networkBasedSVM, folds=3, repeats=1, DEBUG=TRUE, parallel=FALSE, adjacencyList=ad.list, lambdas=10^(-1:2), sd.cutoff=50)
+#' }
 fit.networkBasedSVM <- function (exps, y, DEBUG=FALSE, n.inner=3, scale=c('center', 'scale'), sd.cutoff=1, lambdas=10^(-2:4), adjacencyList){
 
   if(is.factor(y)) y <- sign(as.numeric(y) - 1.5)
@@ -240,9 +242,11 @@ bdiag<-function(n){
 #' @callGraphPrimitives
 #' @author Marc Johannes \email{M.Johannes@@DKFZ.de}
 #' @examples
+#' \dontrun{
 #' library(pathClass)
 #' data(adjacency.matrix)
 #' ad.list <- as.adjacencyList(adjacency.matrix)
+#' }
 as.adjacencyList <- function (adjacency.matrix, skip.redundant.nodes = TRUE, is.directed = FALSE){
   if (ncol(adjacency.matrix) != nrow(adjacency.matrix)) {
     stop("Matrix is non square")

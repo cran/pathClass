@@ -28,9 +28,8 @@ i.e. on several cpu-cores. (see also \code{Details} section)}
 Defaults to n - 1 cores.}
 \item{...}{additional parameters to theta fit.}
 }
-\examples{library(Biobase)
-data(sample.ExpressionSet)
-x <- t(exprs(sample.ExpressionSet))
-y <- factor(pData(sample.ExpressionSet)$sex)
-res.rfe <- crossval(x,y,DEBUG=TRUE,theta.fit=fit.rfe,folds=2,repeats=1,parallel=TRUE,Cs=10^(-3:3))}
+\examples{set.seed(4321)
+data(example_data)
+res.rfe  <- crossval(x, y, DEBUG=TRUE, theta.fit=fit.rfe, folds=2, repeats=1, parallel=TRUE, Cs=10^(-3:3))
+res.rrfe <- crossval(x, y, DEBUG=TRUE, theta.fit=fit.rrfe, folds=3, repeats=1, parallel=TRUE, Cs=10^(-3:3), mapping=mapping, Gsub=adjacency.matrix, d=1/2)}
 

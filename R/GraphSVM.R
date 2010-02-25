@@ -23,6 +23,7 @@
 #'
 #' @author Marc Johannes \email{M.Johannes@@DKFZ.de}
 #' @examples
+#' \dontrun{
 #' library(Biobase)
 #' data(sample.ExpressionSet)
 #' x <- t(exprs(sample.ExpressionSet))
@@ -39,6 +40,7 @@
 #' matched <- matchMatrices(x=x, adjacency=adjacency.matrix, mapping=mapping)
 #' dk <- calc.diffusionKernel(L=matched$adjacency, is.adjacency=TRUE, beta=0) # beta should be tuned
 #' res.gSVM <- crossval(matched$x, y, theta.fit=fit.graph.svm, folds=5, repeats=2, DEBUG=TRUE, parallel=FALSE, Cs=10^(-3:3), mapping=matched$mapping, diffusionKernel=dk)
+#' }
 fit.graph.svm <- function(x, y, DEBUG=FALSE, scale=c('center', 'scale'), Cs=10^c(-3:3), stepsize=0.1,  mapping, diffusionKernel){
   best.bound = Inf
   feat = colnames(x)

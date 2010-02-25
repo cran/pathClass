@@ -14,10 +14,12 @@ number a feature can be choosen is 50.}
 \item{toFile}{Should the results be printed into a CSV-file.}
 \item{fName}{the name of the file to save the results in.}
 }
-\examples{library(Biobase)
+\examples{\dontrun{
+library(Biobase)
 data(sample.ExpressionSet)
 x <- t(exprs(sample.ExpressionSet))
 y <- factor(pData(sample.ExpressionSet)$sex)
 res.rfe <- crossval(x,y,DEBUG=TRUE,theta.fit=fit.rfe,folds=2,repeats=1,parallel=TRUE,Cs=10^(-3:3))
-extractFeatures(res.rfe, toFile=FALSE)}
+extractFeatures(res.rfe, toFile=FALSE)
+}}
 

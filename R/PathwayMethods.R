@@ -9,6 +9,38 @@
 #' @keywords data
 NULL
 
+#' Example gene expression data
+#' 
+#' A data matrix \code{x} containing gene expression data of 10 patients
+#'
+#' @name x
+#' @docType data
+#' @author Marc Johannes \email{M.Johannes@@DKFZ.de}
+#' @keywords data
+NULL
+
+#' Example class labels for the gene expression data
+#' 
+#' Class labels for the 10 patients contained the data matrix \code{x}
+#'
+#' @name y
+#' @docType data
+#' @author Marc Johannes \email{M.Johannes@@DKFZ.de}
+#' @keywords data
+NULL
+
+#' A mapping of Refseq Protein IDs to probe set IDs for the gene expression data
+#' 
+#' A mapping of the hgu95av2 probe set IDs in x to the Refseq protein IDs contained
+#' in adjacency.matrix
+#'
+#' @name mapping
+#' @docType data
+#' @author Marc Johannes \email{M.Johannes@@DKFZ.de}
+#' @keywords data
+NULL
+
+
 #' Summarize probe sets
 #'
 #' Summarize multiple probe sets targeting one gene into one value for that gene.
@@ -145,6 +177,7 @@ read.hprd <- function(fname, chipProteins = NULL){
 #' @callGraphPrimitives
 #' @author Marc Johannes \email{M.Johannes@@DKFZ.de}
 #' @examples
+#' \dontrun{
 #' library(Biobase)
 #' data(sample.ExpressionSet)
 #' x <- t(exprs(sample.ExpressionSet))
@@ -159,6 +192,7 @@ read.hprd <- function(fname, chipProteins = NULL){
 #' library(pathClass)
 #' data(adjacency.matrix)
 #' matched <- matchMatrices(x=x, adjacency=adjacency.matrix, mapping=mapping)
+#' }
 matchMatrices <- function(x, mapping, adjacency){
 
   mapping <- unique(mapping)

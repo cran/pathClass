@@ -44,11 +44,10 @@ NULL
 #' @seealso \code{\link{fit.rrfe}}, \code{\link{fit.rfe}}, \code{\link{fit.graph.svm}}, \code{\link{fit.networkBasedSVM}}
 #' @author Marc Johannes \email{M.Johannes@@DKFZ.de}
 #' @examples
-#' library(Biobase)
-#' data(sample.ExpressionSet)
-#' x <- t(exprs(sample.ExpressionSet))
-#' y <- factor(pData(sample.ExpressionSet)$sex)
-#' res.rfe <- crossval(x,y,DEBUG=TRUE,theta.fit=fit.rfe,folds=2,repeats=1,parallel=TRUE,Cs=10^(-3:3))
+#' set.seed(4321)
+#' data(example_data)
+#' res.rfe  <- crossval(x, y, DEBUG=TRUE, theta.fit=fit.rfe, folds=2, repeats=1, parallel=TRUE, Cs=10^(-3:3))
+#' res.rrfe <- crossval(x, y, DEBUG=TRUE, theta.fit=fit.rrfe, folds=3, repeats=1, parallel=TRUE, Cs=10^(-3:3), mapping=mapping, Gsub=adjacency.matrix, d=1/2)
 crossval <- function(x, y, theta.fit, folds=10, repeats=1, parallel = TRUE, cores = NULL, DEBUG=FALSE, ...){
 
   multicore <- ("package:multicore" %in% search())
@@ -196,12 +195,14 @@ calc.auc <- function(prob,labels)
 #' @export
 #' @author Marc Johannes \email{M.Johannes@@DKFZ.de}
 #' @examples
+#' \dontrun{
 #' library(Biobase)
 #' data(sample.ExpressionSet)
 #' x <- t(exprs(sample.ExpressionSet))
 #' y <- factor(pData(sample.ExpressionSet)$sex)
 #' res.rfe <- crossval(x,y,DEBUG=TRUE,theta.fit=fit.rfe,folds=2,repeats=1,parallel=TRUE,Cs=10^(-3:3))
 #' plot(res.rfe, toFile=FALSE)
+#' }
 plot.pathClassResult <- function(x, label='', toFile=TRUE, fname='Result', switchLabels=FALSE, avg="horizontal", spread.estimate="boxplot",...){
 
   run <- label
@@ -258,12 +259,14 @@ plot.pathClassResult <- function(x, label='', toFile=TRUE, fname='Result', switc
 #' @export
 #' @author Marc Johannes \email{M.Johannes@@DKFZ.de}
 #' @examples
+#' \dontrun{
 #' library(Biobase)
 #' data(sample.ExpressionSet)
 #' x <- t(exprs(sample.ExpressionSet))
 #' y <- factor(pData(sample.ExpressionSet)$sex)
 #' res.rfe <- crossval(x,y,DEBUG=TRUE,theta.fit=fit.rfe,folds=2,repeats=1,parallel=TRUE,Cs=10^(-3:3))
 #' extractFeatures(res.rfe, toFile=FALSE)
+#' }
 extractFeatures <- function(res, toFile=FALSE, fName='ClassificationFeatures.csv'){
   if(class(res) != 'pathClassResult') stop('\'res\' must be of class \'pathClassResult\'')
   
