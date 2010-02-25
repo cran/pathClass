@@ -2,7 +2,7 @@
 \alias{fit.graph.svm}
 \title{Implementation of a supervised classification framework introduced by Franck Rapaport et al.}
 \usage{fit.graph.svm(x, y, DEBUG=FALSE, scale=c("center", "scale"), Cs=10^c(-3:3),
-    stepsize=0.1, mapping, diffusionKernel)
+    stepsize=0.1, mapping, diffusionKernel, useOrigMethod=FALSE)
 }
 \description{Implementation of a supervised classification framework introduced by Franck Rapaport et al., 2007.}
 \details{\code{mapping} must be a data.frame with at least two columns. The column names have to be \code{c('probesetID','graphID')}.
@@ -12,7 +12,8 @@ a gene or protein in the network might be represented by more than one probe set
 which genes/protein in the network belongs to which probeset on the chip.}
 \value{a graphSVM object \item{features}{the selected features} \item{error.bound}{the span bound of the model} \item{fit}{the fitted SVM model}}
 \references{Rapaport F. et al. (2007). Classification of microarray data using gene networks. \emph{BMC Bioinformatics}}
-\note{The optimal number of features is found by using the span estimate. See Chapelle, O., Vapnik, V., Bousquet, O., and Mukherjee, S. (2002). Choosing multiple parameters for support vector machines. \emph{Machine Learning}, 46(1), 131-159.}
+\note{We combined the original method with a Recursive Feature Elimination in order to allow a feature selection.
+The optimal number of features is found by using the span estimate. See Chapelle, O., Vapnik, V., Bousquet, O., and Mukherjee, S. (2002). Choosing multiple parameters for support vector machines. \emph{Machine Learning}, 46(1), 131-159.}
 \author{Marc Johannes \email{M.Johannes@DKFZ.de}}
 \arguments{\item{x}{a p x n matrix of expression measurements with p samples and n genes.}
 \item{y}{a factor of length p comprising the class labels.}
@@ -23,6 +24,7 @@ Possible values are \emph{center} and/or \emph{scale}. Defaults to \code{c('cent
 \item{stepsize}{amount of features that are discarded in each step of the feature elimination. Defaults to 10\%.}
 \item{mapping}{a mapping that defines how probe sets are summarized to genes.}
 \item{diffusionKernel}{the diffusion kernel which was pre-computed by using the function \code{\link{calc.diffusionKernel}}}
+\item{useOrigMethod}{use the method originally decribed in the paper by Franck Rapaport et al. 2007}
 }
 \examples{\dontrun{
 library(Biobase)

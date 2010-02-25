@@ -132,6 +132,12 @@ match both objects to each other. Therefore, we need a mapping
 containing the information which protein of \texttt{hprd}
 matches to which probe set in \texttt{x}.
 
+As an alternative, the user can load a small fake network using the command:
+<<hprd2, eval=FALSE>>=
+data(adjacency.matrix)
+hprd <- adjacency.matrix
+@ 
+
 \subsection{The mapping}
 For most microarrays there is a annotation package available. Since we
 are dealing with expression data from chip

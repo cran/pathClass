@@ -15,11 +15,13 @@
 #' @param stepsize amount of features that are discarded in each step of the feature elimination. Defaults to 10\%.
 #' @param mapping a mapping that defines how probe sets are summarized to genes.
 #' @param diffusionKernel the diffusion kernel which was pre-computed by using the function \code{\link{calc.diffusionKernel}}
+#' @param useOrigMethod use the method originally decribed in the paper by Franck Rapaport et al. 2007
 #' @return a graphSVM object \item{features}{the selected features} \item{error.bound}{the span bound of the model} \item{fit}{the fitted SVM model}
 #' @references Rapaport F. et al. (2007). Classification of microarray data using gene networks. \emph{BMC Bioinformatics}
 #' @export
 #' @callGraphPrimitives
-#' @note The optimal number of features is found by using the span estimate. See Chapelle, O., Vapnik, V., Bousquet, O., and Mukherjee, S. (2002). Choosing multiple parameters for support vector machines. \emph{Machine Learning}, 46(1), 131-159.
+#' @note We combined the original method with a Recursive Feature Elimination in order to allow a feature selection.
+#' The optimal number of features is found by using the span estimate. See Chapelle, O., Vapnik, V., Bousquet, O., and Mukherjee, S. (2002). Choosing multiple parameters for support vector machines. \emph{Machine Learning}, 46(1), 131-159.
 #'
 #' @author Marc Johannes \email{M.Johannes@@DKFZ.de}
 #' @examples
@@ -41,46 +43,55 @@
 #' dk <- calc.diffusionKernel(L=matched$adjacency, is.adjacency=TRUE, beta=0) # beta should be tuned
 #' res.gSVM <- crossval(matched$x, y, theta.fit=fit.graph.svm, folds=5, repeats=2, DEBUG=TRUE, parallel=FALSE, Cs=10^(-3:3), mapping=matched$mapping, diffusionKernel=dk)
 #' }
-fit.graph.svm <- function(x, y, DEBUG=FALSE, scale=c('center', 'scale'), Cs=10^c(-3:3), stepsize=0.1,  mapping, diffusionKernel){
+fit.graph.svm <- function(x, y, DEBUG=FALSE, scale=c('center', 'scale'), Cs=10^c(-3:3), stepsize=0.1,  mapping, diffusionKernel, useOrigMethod=FALSE){
   best.bound = Inf
   feat = colnames(x)
 
-  if(missing(mapping)) stop('You must provide a mapping.')
   if(missing(diffusionKernel)) stop('Need the diffusion kernel for classification')
-
-  while(NCOL(x) > 1){
-    if(DEBUG) cat(NCOL(x),' Features left.\n')
-
-    fit = calc.graph.svm(x=x, y=y, Cs=Cs, R=diffusionKernel, scale=scale, DEBUG=DEBUG)
-    
-    if(fit$error.bound <= best.bound){
-      best.bound = fit$error.bound
-      feat  = colnames(x)			
-      best.fit   = fit
-      if(DEBUG) cat('Model Updated. Spanbound=',best.bound,', C=',best.fit$C,', ', length(feat),'features.\n')
-    }
-    
-    ord     <-  order(fit$w)
-    remove  <- colnames(x)[ord[1:round(NCOL(x)*stepsize)]]
-    keep    <- setdiff(colnames(x), remove)
-    x       <- x[ , keep, drop=FALSE]
-    diffusionKernel <- diffusionKernel[keep, keep, drop=FALSE]
-  }
-  if(DEBUG) cat('Best Model is: Spanbound=',best.fit$error.bound,', C=',best.fit$C,',', length(best.fit$features),'features.')
+  if(missing(mapping)) stop('You must provide a mapping.')
+  result <- NULL
   
-  result <- list(features=feat, error.bound = best.bound, fit=best.fit)
+  if(!useOrigMethod){
+
+    while(NCOL(x) > 1){
+      if(DEBUG) cat(NCOL(x),' Features left.\n')
+
+      fit = calc.graph.svm(x=x, y=y, Cs=Cs, R=diffusionKernel, scale=scale, DEBUG=DEBUG)
+      
+      if(fit$error.bound <= best.bound){
+        best.bound = fit$error.bound
+        feat  = colnames(x)			
+        best.fit   = fit
+        if(DEBUG) cat('Model Updated. Spanbound=',best.bound,', C=',best.fit$C,', ', length(feat),'features.\n')
+      }
+      
+      ord     <-  order(fit$w)
+      remove  <- colnames(x)[ord[1:round(NCOL(x)*stepsize)]]
+      keep    <- setdiff(colnames(x), remove)
+      x       <- x[ , keep, drop=FALSE]
+      diffusionKernel <- diffusionKernel[keep, keep, drop=FALSE]
+    }
+    if(DEBUG) cat('Best Model is: Spanbound=',best.fit$error.bound,', C=',best.fit$C,',', length(best.fit$features),'features.')
+    
+    result <- list(features=feat, error.bound = best.bound, fit=best.fit)
+  } else{
+    fit = calc.graph.svm(x=x, y=y, Cs=Cs, R=diffusionKernel, scale=scale, DEBUG=DEBUG, calcW=FALSE)
+    result <- list(features=colnames(x), error.bound = fit$error.bound, fit=fit)
+  }
+  
   class(result) <- 'graphSVM'
   return(result)
-
-
 }
+
 
 # x: data
 # y: vector (length n)
 # Cs: regularization parameters
 # R: diffusion kernel matrix between network node pairs
-# PPIgenes: column names of x, which map to network nodes
-# calculate feature influence?
+# scale: scale/center data?
+# calcW:calc feature influences?
+# DEBUG:print debug messages?
+# orig : use original implementation
 calc.graph.svm = function(x, y, Cs, R, scale, calcW=TRUE, DEBUG=FALSE){
   
   if(missing(x))     stop('No epxression matrix provided.')
@@ -109,6 +120,7 @@ calc.graph.svm = function(x, y, Cs, R, scale, calcW=TRUE, DEBUG=FALSE){
       names(scale.std) = colnames(x)
     }
   }
+
   ## unknowns = setdiff(colnames(x), PPIgenes)
   K = matrix(0, ncol=NROW(x), nrow=NROW(x))	
   ## if(length(PPIgenes) > 0){				
