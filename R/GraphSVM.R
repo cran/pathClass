@@ -157,9 +157,30 @@ calc.graph.svm = function(x, y, Cs, R, scale, calcW=TRUE, DEBUG=FALSE){
   list(fit.svm=fit, C=Cbest, R=R, w=w, error.bound=best.bound, xsvs=x[svs,,drop=FALSE], scale.mean=scale.mean, scale.std=scale.std, features=colnames(x))
 }
 
-predict.graphSVM <- function(fit, newdata, type="response"){
+#' Predict Method for Graph-SVM Fits
+#'
+#' Obtains predictions from a fitted graphSVM object.
+#'
+#' @param object a fitted object of class inheriting from 'graphSVM'
+#' @param newdata a matrix with variables to predict
+#' @param type \code{response} gives the predictions \code{class} gives the predicted classes.
+#' @param ... currently ignored.
+#' @return the predictions.
+#' @export
+#' @callGraphPrimitives
+#' @author Marc Johannes \email{M.Johannes@@DKFZ.de}
+#' @examples
+#' \dontrun{
+#' library(pathClass)
+#' data(example_data)
+#' matched <- matchMatrices(x=x, adjacency=adjacency.matrix, mapping=mapping)
+#' dk <- calc.diffusionKernel(L=matched$adjacency, is.adjacency=TRUE, beta=0) # beta should be tuned
+#' fit <- fit.graph.svm(matched$x[1:5,], y[1:5], DEBUG=TRUE, mapping=matched$mapping, diffusionKernel=dk)
+#' predict(fit, newdata=matched$x[6:10,])
+#' }
+predict.graphSVM <- function(object, newdata, type="response", ...){
 
-  fit <- fit$fit
+  fit <- object$fit
   
   ## do the prediction only with those genes
   ## that were use for training

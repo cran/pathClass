@@ -136,7 +136,7 @@ classify <- function(fold, cuts, pb, x, y, theta.fit, cv.repeat, DEBUG=FALSE, ..
 
   ## train and test the model
   trained <- theta.fit(x[trn,,drop=FALSE], y[trn], DEBUG=DEBUG, ...)
-  test    <- predict(fit=trained, newdata=x[tst,,drop=FALSE])
+  test    <- predict(object=trained, newdata=x[tst,,drop=FALSE])
 
   ## save the test indices
   trained[["tst.indices"]] <- tst

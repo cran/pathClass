@@ -117,8 +117,27 @@ fit.rrfe = function(x, y, DEBUG=FALSE, scale=c('center', 'scale'), Cs=10^c(-3:3)
   return(result)
 }
 
-predict.rrfe = function(fit, newdata){
-    svm.predict(fit$fit, newdata, type='response')
+#' Predict Method for RRFE Fits
+#'
+#' Obtains predictions from a fitted RRFE object.
+#'
+#' @param object a fitted object of class inheriting from 'rrfe'
+#' @param newdata a matrix with variables to predict
+#' @param type \code{response} gives the predictions \code{class} gives the predicted classes.
+#' @param ... currently ignored.
+#' @return the predictions.
+#' @export
+#' @callGraphPrimitives
+#' @author Marc Johannes \email{M.Johannes@@DKFZ.de}
+#' @examples
+#' \dontrun{
+#' library(pathClass)
+#' data(example_data)
+#' fit = fit.rrfe(x[1:5,], y[1:5], DEBUG=T, mapping=mapping, Gsub=adjacency.matrix)
+#' predict(fit, newdata=x[6:10,])
+#' }
+predict.rrfe = function(object, newdata, type='response', ...){
+    svm.predict(object$fit, newdata, type)
 }
 
 ## Transforms the GeneRank result as
@@ -154,4 +173,56 @@ getRanking <- function(graph, exprs, d=0.5){
   names(ranks) <- rank.names
 
   ranks  
+}
+
+
+#' Calculate GeneRanks as used by RRFE
+#'
+#' Uses the GeneRank  to calculate the ranks for genes. Afterwards the ranks 
+#' are transformed as needed for the RRFE algorithm.
+#'
+#' @param x a p x n matrix of expression measurements with p samples and n genes.
+#' @param y a factor of length p comprising the class labels.
+#' @param mapping a mapping that defines how probe sets are summarized to genes.
+#' @param Gsub an adjacency matrix that represents the underlying biological network.
+#' @param method see help of \link{summarizeProbes}
+#' @param d the damping factor which controls the influence of the network data and the fold change on the ranking of the genes.
+#' Defaults to 0.5 
+#' @return a ranking of the genes for which pathway knowledge was available.
+#' @references Johannes M, et al. (2010). Integration Of Pathway Knowledge Into A Reweighted Recursive Feature Elimination Approach For Risk Stratification Of Cancer Patients. \emph{Bioinformatics}
+#' @export
+#' @callGraphPrimitives
+#' @author Marc Johannes \email{M.Johannes@@DKFZ.de}
+#' @examples
+#' \dontrun{
+#' library(pathClass)
+#' data(example_data)
+#' ranks = getGeneRanks(x, y, mapping=mapping, Gsub=adjacency.matrix)
+#' }
+getGeneRanks <- function(x, y, mapping, Gsub, method="foldChange", d=0.5){
+
+  if(missing(mapping)) stop('You must provide a mapping.')
+  if(missing(Gsub))    stop('RRFE needs the underlying grap structure.')
+
+  ## discard rows from the mapping which are not needed
+  ## because they are not present in x
+  ## which might happen if the user does not use the full chip
+  mapping <- mapping[mapping[,'probesetID'] %in% colnames(x),]
+  if(nrow(mapping) == 0) stop('Probeset IDs of the mapping do not fit to the column names of x!')
+
+  int <- intersect(rownames(Gsub), mapping[,"graphID"])
+  Gsub <- Gsub[int, int]
+  mapping <- mapping[mapping[,'graphID'] %in% int,]
+
+  ## 3. fit chip to mapping
+  x <- x[,mapping[,'probesetID']]
+  
+  ## calculate the fold change for a gene by using all probes
+  ## targeting that gene
+  exprs.sum <- summarizeProbes(exprs=t(x), mapping=mapping, method=method, groups=y, adjacency=Gsub)
+  ranks     <- getRanking(Gsub, exprs.sum, d=d)
+  ## distribute the rank of the gene back to its probes
+  ranks     <- desummarize.ranks(ranks, mapping)
+
+  return(ranks)
 }

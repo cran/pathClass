@@ -52,9 +52,27 @@ fit.rfe = function(x, y, DEBUG=FALSE, scale=c('center', 'scale'), Cs=10^c(-3:3),
   return(result)
 }
 
-
-predict.rfe = function(fit, newdata, type="response"){
-    svm.predict(fit$fit, newdata, type)
+#' Predict Method for RFE Fits
+#'
+#' Obtains predictions from a fitted RFE object.
+#'
+#' @param object a fitted object of class inheriting from 'rfe'
+#' @param newdata a matrix with variables to predict
+#' @param type \code{response} gives the predictions \code{class} gives the predicted classes.
+#' @param ... currently ignored.
+#' @return the predictions.
+#' @export
+#' @callGraphPrimitives
+#' @author Marc Johannes \email{M.Johannes@@DKFZ.de}
+#' @examples
+#' \dontrun{
+#' library(pathClass)
+#' data(example_data)
+#' fit = fit.rfe(x[1:5,], y[1:5], DEBUG=T)
+#' predict(fit, newdata=x[6:10,])
+#' }
+predict.rfe = function(object, newdata, type="response", ...){
+    svm.predict(object$fit, newdata, type)
 }
 
 

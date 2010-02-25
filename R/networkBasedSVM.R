@@ -150,19 +150,39 @@ calc.networkBasedSVM <- function(x, tr.y, lambda, nnb, unique.net, keep.gene, sc
   list(beta.hat=beta.est, lambda=lambda, scale.mean=scale.mean, scale.std=scale.std, features=colnames(x))
 }
 
-predict.networkBasedSVM <- function(fit, newdata){
+#' Predict Method for Network-based SVM Fits
+#'
+#' Obtains predictions from a fitted networkBasedSVM object.
+#'
+#' @param object a fitted object of class inheriting from 'networkBasedSVM'
+#' @param newdata a matrix with variables to predict
+#' @param ... currently ignored.
+#' @return the predictions.
+#' @export
+#' @callGraphPrimitives
+#' @author Marc Johannes \email{M.Johannes@@DKFZ.de}
+#' @examples
+#' \dontrun{
+#' library(pathClass)
+#' data(example_data)
+#' matched <- matchMatrices(x=x, adjacency=adjacency.matrix, mapping=mapping)
+#' ad.list <- as.adjacencyList(matched$adjacency)
+#' fit = fit.networkBasedSVM(matched$x[1:5,], y[1:5], DEBUG=TRUE,  adjacencyList=ad.list, lambdas=10^(-1:2), sd.cutoff=50)
+#' predict(fit, newdata=matched$x[6:10,])
+#' }
+predict.networkBasedSVM <- function(object, newdata, ...){
 
   ## do the prediction only with those genes
   ## that were use for training
-  newdata <- newdata[,fit$features]
+  newdata <- newdata[,object$features]
 
-  if(!is.null(fit$scale.mean))
-    newdata <- scale(newdata, center=fit$scale.mean[fit$features], scale=FALSE)
+  if(!is.null(object$scale.mean))
+    newdata <- scale(newdata, center=object$scale.mean[object$features], scale=FALSE)
   
-  if(!is.null(fit$scale.std))
-    newdata <- scale(newdata, center=FALSE, scale=fit$scale.std[fit$features])
+  if(!is.null(object$scale.std))
+    newdata <- scale(newdata, center=FALSE, scale=object$scale.std[object$features])
 
-  cbind(rep(1,nrow(newdata)), newdata) %*% fit$beta
+  cbind(rep(1,nrow(newdata)), newdata) %*% object$beta
 }
 
 create.constraints.matrix <- function(tr.exps, tr.y, nnb, unique.net, keep.gene){
