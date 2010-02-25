@@ -1,0 +1,323 @@
+\documentclass[12pt]{article}
+
+\usepackage{times}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{setspace}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{Sweave}
+\usepackage[authoryear,round]{natbib}
+\usepackage{times}
+\usepackage{comment}
+\usepackage{caption}
+\usepackage{color}
+
+%% definitions
+\definecolor{white}{rgb}{1,1,1}
+\definecolor{darkblue}{rgb}{0,0,.5}
+\definecolor{black}{rgb}{0,0,0}
+\textwidth=6.2in
+\textheight=9in
+%\parskip=.3cm
+\parindent0pt
+\oddsidemargin=.1in
+\evensidemargin=.1in
+\headheight=-.3in
+\topmargin 0.5em 
+\newcommand{\scscst}{\scriptscriptstyle}
+\newcommand{\scst}{\scriptstyle}
+\newcommand{\Rfunction}[1]{{\texttt{#1}}}
+\newcommand{\Robject}[1]{{\texttt{#1}}}
+\newcommand{\Rpackage}[1]{{\textit{#1}}}
+\newcommand{\Rclass}[1]{{\textit{#1}}}
+\newcommand{\Rmethod}[1]{{\textit{#1}}}
+\newcommand{\Rfunarg}[1]{{\textit{#1}}}
+
+\SweaveOpts{keep.source=TRUE}
+
+% \VignetteIndexEntry{An R Package for classification with prior knowledge of feature connectivity}
+% \VignetteDepends{pathClass}
+% \VignetteKeyword{machine learning}
+
+
+\usepackage{hyperref}
+\hypersetup{pdftex=true, colorlinks=true, breaklinks=true, linkcolor=darkblue, menucolor=darkblue, pagecolor=darkblue, urlcolor=darkblue, citecolor=darkblue}
+\begin{document}
+%\doublespacing
+
+\title{pathClass: Classification with prior knowledge on feature connectivity\\{\small(Version 1.0.0)}\\[5mm]
+User`s Guide \\}
+
+\author{Marc Johannes\\
+German Cancer Research Center\\
+Heidelberg, Germany}
+
+\date{\today}
+\maketitle
+
+\tableofcontents{}
+
+\section{Introduction}
+The package \texttt{pathClass} was developed for classification tasks
+with the usage of \emph{prior} knowledge about the feature
+connectivity. At the German Cancer Research Center we are dealing
+mostly with biological data. Thus, in this vignette we demonstrate the
+usage of the package and its functions using biologically data.
+
+\section{What data do we need}
+For a \emph{standard} classification task one needs a data matrix to train on
+as well as class labels which tell the algorithm to what class a
+sample belongs to. However, we now have an additional source of
+knowledge, i.e. a graph structure. For the algorithm to know which
+feature in the data matrix corresponds to which node in the graph we
+need a mapping as well. In the follwing sections we will describe the
+structure of these data objects and give examples how to create and
+use them.
+
+\subsection{The data matrix}
+At first we need a data matrix $\mathbf{D}^{n \times p}$ with $n$
+samples of $p$ measurements. As an example we load:
+<<loadDataMatrix, eval=true>>=
+library(Biobase)
+data(sample.ExpressionSet)
+sample.ExpressionSet
+@
+This data set contains \Sexpr{nrow(exprs(sample.ExpressionSet))}
+features measured in
+\Sexpr{ncol(exprs(sample.ExpressionSet))} samples. However, we need the
+transposed version of it:
+<<dataMatrix, eval=TRUE>>=
+x <- t(exprs(sample.ExpressionSet))
+dim(x)
+@ 
+
+\subsection{The class labels}
+We create some class labels using the \texttt{phenoData} object:
+<<classLabels, eval=TRUE>>=
+y <- factor(pData(sample.ExpressionSet)$sex)
+y
+@ 
+
+From this output we can see that \texttt{y} has the same length as
+\texttt{nrow(x)}, i.e. \Sexpr{length(y)}.
+
+\subsection{The graph}
+As a next step we have to create a adjacency matrix that represents
+the connectivity of the features in \texttt{x}. Therefore, we download
+from \href{http://www.hprd.org/download}{\texttt{http://www.hprd.org/download}} the file of binary
+protein-protein interactions in tab delimited format. After extracting
+the archive we use \texttt{pathClass} to read the tab-delimited file:
+<<loadPathClass, eval=TRUE, results=hide>>=
+library(pathClass)
+@ 
+
+<<hprd, eval=FALSE>>=
+hprd <- read.hprd('BINARY_PROTEIN_PROTEIN_INTERACTIONS.txt')
+@ 
+However, for the purpose of the vignette we will use a random graph
+with RefSeq IDs as \texttt{rownames} and \texttt{colnames}. This graph
+can be loaded as follows:
+<<sampleGraph, eval=True>>=
+data(adjacency.matrix)
+@ 
+This gives us an adjacency matrix of dimensions \Sexpr{nrow(adjacency.matrix)}
+$\times$ \Sexpr{ncol(adjacency.matrix)}. Since most classification
+algorithm can ``only'' use those features which that are present in both the
+data matrix \texttt{x} and the \texttt{adjacency.matrix} we have to
+match both objects to each other. Therefore, we need a mapping
+containing the information which protein of \texttt{adjacency.matrix}
+matches to which probe set in \texttt{x}.
+
+\subsection{The mapping}
+For most microarrays there is a annotation package available. Since we
+are dealing with expression data from chip
+\texttt{\Sexpr{annotation(sample.ExpressionSet)}} we load the
+corresponding annotation package and create a mapping from probe set
+ID to protein ID:
+<<mapping, eval=TRUE>>=
+library('hgu95av2.db')
+mapped.probes <- mappedkeys(hgu95av2REFSEQ)
+refseq <- as.list(hgu95av2REFSEQ[mapped.probes])
+times <- sapply(refseq, length)
+mapping <- data.frame(probesetID=rep(names(refseq), times=times),
+                      graphID=unlist(refseq),
+                      row.names=NULL,
+                      stringsAsFactors=FALSE)
+mapping <- unique(mapping)
+head(mapping)
+@ 
+
+Now we have a mapping with \Sexpr{nrow(mapping)} rows. It is important
+that this mapping has at least two columns named \textbf{\texttt{graphID}} and
+\textbf{\texttt{probesetID}} since those names are needed internally
+when \texttt{pathClass} makes use of the mapping.
+
+In a next step we can make use of the function
+\texttt{matchMatrices()} to match the data matrix \texttt{x} to the
+\texttt{adjacency.matrix}:
+<<matchMatrices, eval=TRUE>>=
+matched <- matchMatrices(x=x, adjacency=adjacency.matrix, mapping=mapping)
+@ 
+
+The list \texttt{matched} contains copies of \texttt{x}, \texttt{adjacency.matrix}
+and \texttt{mapping} however with matching dimensions. Thus, these
+objects can now be used for classification.
+
+\section{Which classification methods are available}
+That far, all classification algorithms we implemented are based on the
+support vector machine (SVM, \citealt{Cortes:1995p12}). As a standard tool we provide the
+recursive feature elimination (SVM-RFE, \citealt{Guyon:2002p23}) algorithm for the SVM. This
+algorithm performs a feature selection, however it makes no use of
+\emph{prior} knowledge. In addition to SVM-RFE we implemented three
+other SVM-based algorithm that use \emph{prior} knowledge:
+\begin{enumerate}
+\item Reweighted Recursive Feature Elimination (RRFE, \citealt{Johannes2010})
+\item Network-based SVM \citep{Zhu2009}
+\item Graph SVM \citep{Rapaport2007}
+\end{enumerate}
+
+The functions to train these methods are called: \texttt{fit.rfe},
+\texttt{fit.rrfe}, \texttt{fit.networkBasedSVM} and
+\texttt{fit.graph.svm}, respectively. The user can use these functions
+directly to obtain a fit object of the corresponding algorithm or use
+the wrapper-function \texttt{crossval()} to perform a $x$ times
+repeated $y$-fold cross-validation. Additionally the
+\texttt{crossval()} function is able to make use of the multicore
+architecture of modern PCs or a computing cluster. To use the parallel
+version of the method the user has to load the library
+\texttt{multicore} prior to calling \texttt{crossval()} and to set
+the parameter \texttt{parallel} to \texttt{TRUE}.
+
+\subsection{Reweighted Recursive Feature Elimination}
+
+The RRFE method can be run without using the mapping created
+above. The reason for this is, that the method can use all features if
+the user sets the paramter \texttt{useAllFeatures} to
+\texttt{TRUE}. Therefore, this method has its own, internal mapping
+routine. RRFE has an tuning parameter \texttt{d} $\in (0,1)$ that controls the
+influence of the graph structure on the ranking of the genes. A value
+of \texttt{d} $\rightarrow$ 1 puts more weight on the connectivity
+infromation whereas \texttt{d} $\rightarrow$ 0 relies more on the
+expression data. To use the RRFE method one can use:
+<<RRFE, eval=FALSE>>=
+res.rrfe <- crossval(x,
+                     y,
+                     DEBUG=TRUE,
+                     theta.fit=fit.rrfe,
+                     folds=3,
+                     repeats=1,
+                     parallel=TRUE,
+                     Cs=10^(-3:3),
+                     mapping=mapping,
+                     Gsub=adjacency.matrix,
+                     d=1/2)
+@ 
+or, to use all features:
+<<RRFEallFeatures, eval=FALSE>>=
+res.rrfe <- crossval(x,
+                     y,
+                     DEBUG=TRUE,
+                     theta.fit=fit.rrfe,
+                     folds=3,
+                     repeats=1,
+                     parallel=TRUE,
+                     Cs=10^(-3:3),
+                     useAllFeatures=TRUE,
+                     mapping=mapping,
+                     Gsub=adjacency.matrix,
+                     d=1/2)
+@ 
+Please, have a look into the help files or the paper
+\citep{Johannes2010} for more information on the
+\texttt{useAllFeatures} option.
+
+\subsection{network-based SVM}
+The network-based support vector machine \citep{Zhu2009} needs the
+mapping from above, since the dimensions of the data objects have to
+match exactely. However, instead of an adjacency matrix it needs an
+adjacency list which we have to create before:
+
+<<networkBasedSVM, eval=FALSE>>=
+ad.list <- as.adjacencyList(matched$adjacency)
+
+res.nBSVM <- crossval(matched$x,
+                      y,
+                      theta.fit=fit.networkBasedSVM,
+                      folds=3,
+                      repeats=1,
+                      DEBUG=TRUE,
+                      parallel=FALSE,
+                      adjacencyList=ad.list,
+                      lambdas=10^(-1:2),
+                      sd.cutoff=50)
+@ 
+
+Since, the algorithm internally uses \texttt{lpSolve}, it has to calculate a
+constraints-matrix. Thus, when having lots of features this matrix can
+become very big. Therefore, we added the parameter \texttt{sd.cutoff} which
+only keeps genes with standard deviation $\ge$ \texttt{sd.cutoff}.
+
+\subsection{graph SVM}
+
+\cite{Rapaport2007} developed a supervised classification framework
+which we refer to as ``graph SVM''. This methods makes use of a so-called
+diffusion kernel (\textbf{REF}), which has to be calculated before using this method:
+<<graphSVM, eval=FALSE>>=
+dk <- calc.diffusionKernel(L=matched$adjacency,
+                           is.adjacency=TRUE,
+                           beta=0)
+
+res.gSVM <- crossval(matched$x,
+                     y,
+                     theta.fit=fit.graph.svm,
+                     folds=5,
+                     repeats=2,
+                     DEBUG=TRUE,
+                     parallel=FALSE,
+                     Cs=10^(-3:3),
+                     mapping=matched$mapping,
+                     diffusionKernel=dk)
+@ 
+Were \texttt{beta} is a tuning parameter that controls the extent of
+diffusion. This parameter should be optimized.
+
+\section{Showing the results}
+
+We can have a look on the results by typing:
+<<plotting, eval=FALSE>>=
+plot(res.rrfe, toFile=F)
+@ 
+We get a boxplot for each repeat of the cross-validation showing the
+distribution of AUC's obtained by the classifiers trained in the
+repeat as well as a receiver operator characteristic (ROC) curve
+showing the overall performance.
+
+Additionally we can extract the features which have been chosen by the
+classifier by using the following function:
+<<extrFeatures, eval=FALSE>>=
+extractFeatures(res.rrfe, toFile=T, fName='OurFeatures.csv')
+@ 
+
+<<bla, eval=F>>=
+switcher <- function(res){
+  for(j in 1:ncol(res$auc)){
+    for(i in 1:nrow(res$auc)){
+      if(res$auc[i,j] < 0.5){
+        ind <- res$fits[[j]][[i]]$tst.indices
+        res$cv[ind,j] = res$cv[ind,j] * -1
+        res$auc[i,j] = 1 - res$auc[i,j]
+      }
+    }
+  }
+  return(res)
+}
+@ 
+
+\footnotesize
+\bibliographystyle{abbrvnat}
+\bibliography{references}
+
+\end{document}
+
+
