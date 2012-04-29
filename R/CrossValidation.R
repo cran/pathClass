@@ -10,7 +10,7 @@
 #' @name pathClass-package
 #' @aliases pathClass
 #' @title Classification with SMVs and prior knowledge
-#' @author Marc Johannes \email{M.Johannes@@DKFZ.de}
+#' @author Marc Johannes \email{JohannesMarc@@gmail.com}
 #' @keywords package
 #' @docType package
 NULL
@@ -42,7 +42,7 @@ NULL
 #' @note Parallel cross-validation can only be performed if the multicore-package
 #' was loaded prior to calling this function.
 #' @seealso \code{\link{fit.rrfe}}, \code{\link{fit.rfe}}, \code{\link{fit.graph.svm}}, \code{\link{fit.networkBasedSVM}}
-#' @author Marc Johannes \email{M.Johannes@@DKFZ.de}
+#' @author Marc Johannes \email{JohannesMarc@@gmail.com}
 #' @examples
 #' set.seed(4321)
 #' data(example_data)
@@ -193,7 +193,7 @@ calc.auc <- function(prob,labels)
 #' @param spread.estimate method to show the variation around the average of the ROC curve. See \code{'\linkS4class{performance}'} for more information.
 #' @param ... currently ignored.
 #' @export
-#' @author Marc Johannes \email{M.Johannes@@DKFZ.de}
+#' @author Marc Johannes \email{JohannesMarc@@gmail.com}
 #' @examples
 #' \dontrun{
 #' library(Biobase)
@@ -257,7 +257,7 @@ plot.pathClassResult <- function(x, label='', toFile=TRUE, fname='Result', switc
 #' @param fName the name of the file to save the results in.
 #' @return a \code{data.frame} indicating the number of times a feature has been choosen.
 #' @export
-#' @author Marc Johannes \email{M.Johannes@@DKFZ.de}
+#' @author Marc Johannes \email{JohannesMarc@@gmail.com}
 #' @examples
 #' \dontrun{
 #' library(Biobase)

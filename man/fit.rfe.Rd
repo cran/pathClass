@@ -11,7 +11,7 @@
 \code{error.bound} = span bound of the model
 \code{fit} = fitted SVM model}
 \note{The optimal number of features is found by using the span estimate. See Chapelle, O., Vapnik, V., Bousquet, O., and Mukherjee, S. (2002). Choosing multiple parameters for support vector machines. \emph{Machine Learning}, 46(1), 131-159.}
-\author{Marc Johannes \email{M.Johannes@DKFZ.de}}
+\author{Marc Johannes \email{JohannesMarc@gmail.com}}
 \arguments{\item{x}{a p x n matrix of expression measurements with p samples and n genes.}
 \item{y}{a factor of length p comprising the class labels.}
 \item{DEBUG}{should debugging information be plotted.}

@@ -14,7 +14,7 @@ encoded in the \code{mapping} to create a graph of probe sets rather then a grap
 \value{the matched input \item{x}{the expression matrix containing only the features which are also present in the adjacency matrix}
 \item{mapping}{the mapping containing only necessary information}
 \item{adjacency}{the adjacency matrix with the same number of nodes as features in x}}
-\author{Marc Johannes \email{M.Johannes@DKFZ.de}}
+\author{Marc Johannes \email{JohannesMarc@gmail.com}}
 \arguments{\item{x}{the p x n expression matrix with p patients and n genes.}
 \item{mapping}{a mapping which encodes the relationship between the colnames of x and the
 row/colnames of the adjacency matrix.}

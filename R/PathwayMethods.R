@@ -5,7 +5,7 @@
 #'
 #' @name adjacency.matrix
 #' @docType data
-#' @author Marc Johannes \email{M.Johannes@@DKFZ.de}
+#' @author Marc Johannes \email{JohannesMarc@@gmail.com}
 #' @keywords data
 NULL
 
@@ -15,7 +15,7 @@ NULL
 #'
 #' @name x
 #' @docType data
-#' @author Marc Johannes \email{M.Johannes@@DKFZ.de}
+#' @author Marc Johannes \email{JohannesMarc@@gmail.com}
 #' @keywords data
 NULL
 
@@ -25,7 +25,7 @@ NULL
 #'
 #' @name y
 #' @docType data
-#' @author Marc Johannes \email{M.Johannes@@DKFZ.de}
+#' @author Marc Johannes \email{JohannesMarc@@gmail.com}
 #' @keywords data
 NULL
 
@@ -36,7 +36,7 @@ NULL
 #'
 #' @name mapping
 #' @docType data
-#' @author Marc Johannes \email{M.Johannes@@DKFZ.de}
+#' @author Marc Johannes \email{JohannesMarc@@gmail.com}
 #' @keywords data
 NULL
 
@@ -116,7 +116,7 @@ desummarize.ranks <- function(ranks, mapping){
 #' @return An adjacency matrix
 #' @export
 #' @callGraphPrimitives
-#' @author Marc Johannes \email{M.Johannes@@DKFZ.de}
+#' @author Marc Johannes \email{JohannesMarc@@gmail.com}
 #' @examples
 #' \dontrun{
 #' hprd <- read.hprd('BINARY_PROTEIN_PROTEIN_INTERACTIONS.txt')
@@ -175,7 +175,7 @@ read.hprd <- function(fname, chipProteins = NULL){
 #'                           \item{adjacency}{the adjacency matrix with the same number of nodes as features in x}
 #' @export
 #' @callGraphPrimitives
-#' @author Marc Johannes \email{M.Johannes@@DKFZ.de}
+#' @author Marc Johannes \email{JohannesMarc@@gmail.com}
 #' @examples
 #' \dontrun{
 #' library(Biobase)

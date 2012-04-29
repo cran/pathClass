@@ -16,7 +16,7 @@
 #' @export
 #' @callGraphPrimitives
 #' @note The optimal number of features is found by using the span estimate. See Chapelle, O., Vapnik, V., Bousquet, O., and Mukherjee, S. (2002). Choosing multiple parameters for support vector machines. \emph{Machine Learning}, 46(1), 131-159.
-#' @author Marc Johannes \email{M.Johannes@@DKFZ.de}
+#' @author Marc Johannes \email{JohannesMarc@@gmail.com}
 #' @examples
 #' \dontrun{
 #' library(Biobase)
@@ -63,7 +63,7 @@ fit.rfe = function(x, y, DEBUG=FALSE, scale=c('center', 'scale'), Cs=10^c(-3:3),
 #' @return the predictions.
 #' @export
 #' @callGraphPrimitives
-#' @author Marc Johannes \email{M.Johannes@@DKFZ.de}
+#' @author Marc Johannes \email{JohannesMarc@@gmail.com}
 #' @examples
 #' \dontrun{
 #' library(pathClass)

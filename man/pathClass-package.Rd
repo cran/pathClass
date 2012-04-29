@@ -10,7 +10,7 @@ additional knowledge is incorporated into the classification a
 priori. Several authors have shown that this approach significantly
 increases the classification performance.}
 \alias{pathClass}
-\author{Marc Johannes \email{M.Johannes@DKFZ.de}}
+\author{Marc Johannes \email{JohannesMarc@gmail.com}}
 \keyword{package}
 \docType{package}
 

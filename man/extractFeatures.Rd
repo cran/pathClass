@@ -9,7 +9,7 @@ during the cross-validation along with the number of times they have been choose
 When, for example, performing a 5 times repeated 10-fold cross-validation the maximum
 number a feature can be choosen is 50.}
 \value{a \code{data.frame} indicating the number of times a feature has been choosen.}
-\author{Marc Johannes \email{M.Johannes@DKFZ.de}}
+\author{Marc Johannes \email{JohannesMarc@gmail.com}}
 \arguments{\item{res}{A result of \code{crossval}.}
 \item{toFile}{Should the results be printed into a CSV-file.}
 \item{fName}{the name of the file to save the results in.}

@@ -1,12 +1,12 @@
 \name{predict.networkBasedSVM}
 \alias{predict.networkBasedSVM}
 \title{Predict Method for Network-based SVM Fits...}
-\usage{predict.networkBasedSVM(object, newdata, ...)
+\usage{\method{predict}{networkBasedSVM}(object, newdata, ...)
 }
 \description{Predict Method for Network-based SVM Fits}
 \details{Obtains predictions from a fitted networkBasedSVM object.}
 \value{the predictions.}
-\author{Marc Johannes \email{M.Johannes@DKFZ.de}}
+\author{Marc Johannes \email{JohannesMarc@gmail.com}}
 \arguments{\item{object}{a fitted object of class inheriting from 'networkBasedSVM'}
 \item{newdata}{a matrix with variables to predict}
 \item{...}{currently ignored.}

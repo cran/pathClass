@@ -7,7 +7,7 @@
 \details{Calculation of diffusion kernel matrix}
 \value{the diffusion kernel}
 \references{Schoelkopf B, Tsuda K, Vert JP: Kernel Methods in Computational Biology, MIT Press; 2004.}
-\author{Marc Johannes \email{M.Johannes@DKFZ.de}}
+\author{Marc Johannes \email{JohannesMarc@gmail.com}}
 \arguments{\item{L}{Laplacian or transition probability matrix}
 \item{is.adjacency}{is L a laplace or adjacency matrix}
 \item{beta}{beta parameter of the diffusion kernel. beta controls the extent of diffusion.}

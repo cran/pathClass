@@ -15,7 +15,7 @@ using the \code{cores} parameter.}
 \note{Parallel cross-validation can only be performed if the multicore-package
 was loaded prior to calling this function.}
 \seealso{\code{\link{fit.rrfe}}, \code{\link{fit.rfe}}, \code{\link{fit.graph.svm}}, \code{\link{fit.networkBasedSVM}}}
-\author{Marc Johannes \email{M.Johannes@DKFZ.de}}
+\author{Marc Johannes \email{JohannesMarc@gmail.com'}}
 \arguments{\item{x}{a p x n matrix of expression measurements with p samples and n genes.}
 \item{y}{a factor of length p comprising the class labels.}
 \item{theta.fit}{the method to learn a decision boundary. Currently available are \code{\link{fit.rrfe}}, \code{\link{fit.rfe}}, \code{\link{fit.graph.svm}}, \code{\link{fit.networkBasedSVM}}}

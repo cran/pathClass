@@ -24,7 +24,7 @@
 #' @export
 #' @callGraphPrimitives
 #'
-#' @author Marc Johannes \email{M.Johannes@@DKFZ.de}
+#' @author Marc Johannes \email{JohannesMarc@@gmail.com}
 #' @examples
 #' \dontrun{
 #' library(Biobase)
@@ -160,7 +160,7 @@ calc.networkBasedSVM <- function(x, tr.y, lambda, nnb, unique.net, keep.gene, sc
 #' @return the predictions.
 #' @export
 #' @callGraphPrimitives
-#' @author Marc Johannes \email{M.Johannes@@DKFZ.de}
+#' @author Marc Johannes \email{JohannesMarc@@gmail.com}
 #' @examples
 #' \dontrun{
 #' library(pathClass)
@@ -260,7 +260,7 @@ bdiag<-function(n){
 #' @return an adjacency list.
 #' @export
 #' @callGraphPrimitives
-#' @author Marc Johannes \email{M.Johannes@@DKFZ.de}
+#' @author Marc Johannes \email{JohannesMarc@@gmail.com}
 #' @examples
 #' \dontrun{
 #' library(pathClass)

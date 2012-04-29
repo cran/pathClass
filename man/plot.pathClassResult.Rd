@@ -1,14 +1,14 @@
 \name{plot.pathClassResult}
 \alias{plot.pathClassResult}
 \title{Prints the result of one or more cross-validation run(s)...}
-\usage{plot.pathClassResult(x, label="", toFile=TRUE, fname="Result", switchLabels=FALSE,
+\usage{\method{plot}{pathClassResult}(x, label="", toFile=TRUE, fname="Result", switchLabels=FALSE,
     avg="horizontal", spread.estimate="boxplot", ...)
 }
 \description{Prints the result of one or more cross-validation run(s)}
 \details{This function creates boxplots of the distribution of AUC for each reapeat of the cross-validation.
 In a second plot the ROC curve of the AUCs is shown. If your result contains more than one cross-validation
 result these are plotted one after the other.}
-\author{Marc Johannes \email{M.Johannes@DKFZ.de}}
+\author{Marc Johannes \email{JohannesMarc@gmail.com}}
 \arguments{\item{x}{A result of \code{crossval}.}
 \item{label}{the main label of the plots.}
 \item{toFile}{Should the results plotted into PDF file(s). If your result contains more than one cross-validation

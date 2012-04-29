@@ -12,7 +12,7 @@ a gene or protein in the network might be represented by more than one probe set
 which genes/protein in the network belongs to which probeset on the chip.}
 \value{a networkBasedSVM object containing \item{features}{the selected features} \item{lambda.performance}{overview how different values of lambda performed in the inner cross validation} \item{fit}{the fitted network based SVM model}}
 \references{Zhu Y. et al. (2009). Network-based support vector machine for classification of microarray samples. \emph{BMC Bioinformatics}}
-\author{Marc Johannes \email{M.Johannes@DKFZ.de}}
+\author{Marc Johannes \email{JohannesMarc@gmail.com}}
 \arguments{\item{exps}{a p x n matrix of expression measurements with p samples and n genes.}
 \item{y}{a factor of length p comprising the class labels.}
 \item{DEBUG}{should debugging information be plotted.}

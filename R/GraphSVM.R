@@ -23,7 +23,7 @@
 #' @note We combined the original method with a Recursive Feature Elimination in order to allow a feature selection.
 #' The optimal number of features is found by using the span estimate. See Chapelle, O., Vapnik, V., Bousquet, O., and Mukherjee, S. (2002). Choosing multiple parameters for support vector machines. \emph{Machine Learning}, 46(1), 131-159.
 #'
-#' @author Marc Johannes \email{M.Johannes@@DKFZ.de}
+#' @author Marc Johannes \email{JohannesMarc@@gmail.com}
 #' @examples
 #' \dontrun{
 #' library(Biobase)
@@ -180,7 +180,7 @@ calc.graph.svm = function(x, y, Cs, R, scale, calcW=TRUE, DEBUG=FALSE){
 #' @return the predictions.
 #' @export
 #' @callGraphPrimitives
-#' @author Marc Johannes \email{M.Johannes@@DKFZ.de}
+#' @author Marc Johannes \email{JohannesMarc@@gmail.com}
 #' @examples
 #' \dontrun{
 #' library(pathClass)
@@ -228,14 +228,14 @@ predict.graphSVM <- function(object, newdata, type="response", ...){
 #' @export
 #' @callGraphPrimitives
 #'
-#' @author Marc Johannes \email{M.Johannes@@DKFZ.de}
+#' @author Marc Johannes \email{JohannesMarc@@gmail.com}
 calc.diffusionKernel = function(L, is.adjacency=FALSE, beta=0){
   if(missing(L)) stop('You have to provide either a laplace or a adjacency matrix to calculate the diffusion kernel.')
   method="thresh"
   if(is.adjacency){
     dnames <- dimnames(L)
     L = graph.adjacency(L, mode='undirected', diag=FALSE)
-    L = graph.laplacian(L, normalize=TRUE)
+    L = graph.laplacian(L, normalized=TRUE)
     dimnames(L) = dnames
   }
   

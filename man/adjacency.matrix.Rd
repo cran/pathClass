@@ -6,6 +6,6 @@
 \details{An adjacency matrix of a random graph with some random Refseq
 Protein IDs for use in example files and the vignette}
 \docType{data}
-\author{Marc Johannes \email{M.Johannes@DKFZ.de}}
+\author{Marc Johannes \email{JohannesMarc@gmail.com}}
 \keyword{data}
 

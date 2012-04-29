@@ -8,7 +8,7 @@
 are transformed as needed for the RRFE algorithm.}
 \value{a ranking of the genes for which pathway knowledge was available.}
 \references{Johannes M, et al. (2010). Integration Of Pathway Knowledge Into A Reweighted Recursive Feature Elimination Approach For Risk Stratification Of Cancer Patients. \emph{Bioinformatics}}
-\author{Marc Johannes \email{M.Johannes@DKFZ.de}}
+\author{Marc Johannes \email{JohannesMarc@gmail.com}}
 \arguments{\item{x}{a p x n matrix of expression measurements with p samples and n genes.}
 \item{y}{a factor of length p comprising the class labels.}
 \item{mapping}{a mapping that defines how probe sets are summarized to genes.}

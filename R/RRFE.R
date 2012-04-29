@@ -29,7 +29,7 @@
 #' @export
 #' @callGraphPrimitives
 #' @note The optimal number of features is found by using the span estimate. See Chapelle, O., Vapnik, V., Bousquet, O., and Mukherjee, S. (2002). Choosing multiple parameters for support vector machines. \emph{Machine Learning}, 46(1), 131-159.
-#' @author Marc Johannes \email{M.Johannes@@DKFZ.de}
+#' @author Marc Johannes \email{JohannesMarc@@gmail.com}
 #' @examples
 #' \dontrun{
 #' library(Biobase)
@@ -128,7 +128,7 @@ fit.rrfe = function(x, y, DEBUG=FALSE, scale=c('center', 'scale'), Cs=10^c(-3:3)
 #' @return the predictions.
 #' @export
 #' @callGraphPrimitives
-#' @author Marc Johannes \email{M.Johannes@@DKFZ.de}
+#' @author Marc Johannes \email{JohannesMarc@@gmail.com}
 #' @examples
 #' \dontrun{
 #' library(pathClass)
@@ -192,7 +192,7 @@ getRanking <- function(graph, exprs, d=0.5){
 #' @references Johannes M, et al. (2010). Integration Of Pathway Knowledge Into A Reweighted Recursive Feature Elimination Approach For Risk Stratification Of Cancer Patients. \emph{Bioinformatics}
 #' @export
 #' @callGraphPrimitives
-#' @author Marc Johannes \email{M.Johannes@@DKFZ.de}
+#' @author Marc Johannes \email{JohannesMarc@@gmail.com}
 #' @examples
 #' \dontrun{
 #' library(pathClass)

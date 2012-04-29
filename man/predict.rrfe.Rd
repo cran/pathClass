@@ -1,12 +1,12 @@
 \name{predict.rrfe}
 \alias{predict.rrfe}
 \title{Predict Method for RRFE Fits...}
-\usage{predict.rrfe(object, newdata, type="response", ...)
+\usage{\method{predict}{rrfe}(object, newdata, type="response", ...)
 }
 \description{Predict Method for RRFE Fits}
 \details{Obtains predictions from a fitted RRFE object.}
 \value{the predictions.}
-\author{Marc Johannes \email{M.Johannes@DKFZ.de}}
+\author{Marc Johannes \email{JohannesMarc@gmail.com}}
 \arguments{\item{object}{a fitted object of class inheriting from 'rrfe'}
 \item{newdata}{a matrix with variables to predict}
 \item{type}{\code{response} gives the predictions \code{class} gives the predicted classes.}
