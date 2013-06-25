@@ -19,8 +19,8 @@ NULL
 #' Performs cross-validation with a specified algorithm
 #'
 #' Performs a cross-validation using the specified algorithms.
-#' If package multicore is loaded the cross-validation will be
-#' performed in parallel. If the multicore package is loaded but a parallel
+#' If package parallel is loaded the cross-validation will be
+#' performed in parallel. If the parallel package is loaded but a parallel
 #' cross-validation is not wanted \code{parallel} can be set to \code{FALSE}.
 #' If parallel cross-validation is desired the number of cores can be choosen by
 #' using the \code{cores} parameter.
@@ -39,7 +39,7 @@ NULL
 #' @return a list with the results of the cross-validation. See details for more information.
 #' @export
 #' @callGraphPrimitives
-#' @note Parallel cross-validation can only be performed if the multicore-package
+#' @note Parallel cross-validation can only be performed if the parallel-package
 #' was loaded prior to calling this function.
 #' @seealso \code{\link{fit.rrfe}}, \code{\link{fit.rfe}}, \code{\link{fit.graph.svm}}, \code{\link{fit.networkBasedSVM}}
 #' @author Marc Johannes \email{JohannesMarc@@gmail.com}
@@ -50,11 +50,11 @@ NULL
 #' res.rrfe <- crossval(x, y, DEBUG=TRUE, theta.fit=fit.rrfe, folds=3, repeats=1, parallel=TRUE, Cs=10^(-3:3), mapping=mapping, Gsub=adjacency.matrix, d=1/2)
 crossval <- function(x, y, theta.fit, folds=10, repeats=1, parallel = TRUE, cores = NULL, DEBUG=FALSE, ...){
 
-  multicore <- ("package:multicore" %in% search())
+  pp <- ("package:parallel" %in% search())
   
-  if(multicore == TRUE && parallel == TRUE){
+  if(pp == TRUE && parallel == TRUE){
     
-    if(is.null(cores)) cores <- multicore:::detectCores()
+    if(is.null(cores)) cores <- parallel:::detectCores()
     options(cores = cores - 1)
     
     cat("Detected ", cores," cores. Will use ", getOption("cores"), " of them.\n")
@@ -62,7 +62,7 @@ crossval <- function(x, y, theta.fit, folds=10, repeats=1, parallel = TRUE, core
   }
   else{
 
-    if(parallel == TRUE) cat('Package \'multicore\' not loaded. Please, load it manually prior to calling this function if you want to run classification in parallel.\n',sep='')
+    if(parallel == TRUE) cat('Package \'parallel\' not loaded. Please, load it manually prior to calling this function if you want to run classification in parallel.\n',sep='')
     cat('Will continue with sequential crossvalidation.\n', sep='')
     parallel <- FALSE
   }
